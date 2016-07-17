@@ -1,0 +1,1 @@
+**This is a simple Qt wrapped class to get the IP informations of given network interface index on Windows based on [IP Helper](https://msdn.microsoft.com/en-us/library/windows/desktop/aa365872(v=vs.85).aspx)**

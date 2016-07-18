@@ -7,9 +7,9 @@
  * \brief A simple class get the various IP informations from the given network interface(usually a physical adapter) index.
  *
  * TODO: long description
- *
- * \note
+ *  
  */
+
 #include "stdafx.h"
 #include "QIPHelper.h"
 
@@ -102,6 +102,8 @@ ip_adapter_info_t const &QIPHelper::get_adapter_info(int index)
 			{
 				this->adapter_info.dhcp_server = "";
 			}
+
+			break;
 		}
 
 		padapter = padapter->Next;

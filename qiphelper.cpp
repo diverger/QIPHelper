@@ -33,10 +33,10 @@ QIPHelper::~QIPHelper()
 }
 
 /*!
- * \brief	
+ * \brief	Get the adapter information from a local network interface index
  *
- * \param	
- * \return	
+ * \param[in]	The network interface index	
+ * \return	The informations of the given interface index
  * \note
  */
 ip_adapter_info_t const &QIPHelper::get_adapter_info(int index)
@@ -78,7 +78,7 @@ ip_adapter_info_t const &QIPHelper::get_adapter_info(int index)
 			{
 				if (i == padapter->AddressLength - 1)
 				{
-					this->adapter_info.address.append(QString().sprintf("%.2X\n", (int)padapter->Address[i]));
+					this->adapter_info.address.append(QString().sprintf("%.2X", (int)padapter->Address[i]));
 				}
 				else
 				{
@@ -115,4 +115,80 @@ ip_adapter_info_t const &QIPHelper::get_adapter_info(int index)
 	}
 
 	return this->adapter_info;
+}
+
+/*!
+ * \brief	
+ *
+ * \param	
+ * \return	
+ */
+QString QIPHelper::get_mac_from_ipaddr(QString addr)
+{
+	IPAddr des_ip = inet_addr(qPrintable(addr));
+	IPAddr src_ip = 0; // default to INADDR_ANY
+	ULONG  mac_addr[2] = { 0 };// for 6-byte hardware address
+	ULONG mac_addr_len = 6;
+	DWORD res;
+
+	memset(mac_addr, 0xff, sizeof(mac_addr));
+
+	qDebug() << "Sending ARP request for IP address: " << addr;
+
+	res = SendARP(des_ip, src_ip, mac_addr, &mac_addr_len);
+
+	BYTE *p;
+	QString	mac;
+	if (res == NO_ERROR)
+	{
+		p = (BYTE *)mac_addr;
+
+		if (mac_addr_len)
+		{
+			for (int i = 0; i < (int)mac_addr_len; ++i)
+			{
+				if (i == (mac_addr_len - 1))
+				{
+					mac.append(QString().sprintf("%.2X", (int)p[i]));
+				}
+				else
+				{
+					mac.append(QString().sprintf("%.2X:", (int)p[i]));
+				}
+			}
+		}
+		else
+		{
+			qDebug() << "Warning: SendArp completed successfully, but returned length=0";
+		}
+	}
+	else
+	{
+		qDebug() << "Error: SendArp failed with error: " << res;
+		switch (res) {
+		case ERROR_GEN_FAILURE:
+			qDebug() << (" (ERROR_GEN_FAILURE)");
+			break;
+		case ERROR_INVALID_PARAMETER:
+			qDebug() << (" (ERROR_INVALID_PARAMETER)");
+			break;
+		case ERROR_INVALID_USER_BUFFER:
+			qDebug() << (" (ERROR_INVALID_USER_BUFFER)");
+			break;
+		case ERROR_BAD_NET_NAME:
+			qDebug() << (" (ERROR_GEN_FAILURE)");
+			break;
+		case ERROR_BUFFER_OVERFLOW:
+			qDebug() << (" (ERROR_BUFFER_OVERFLOW)");
+			break;
+		case ERROR_NOT_FOUND:
+			qDebug() << (" (ERROR_NOT_FOUND)");
+			break;
+		default:
+			qDebug() << ("");
+			break;
+		}
+	}
+
+	return mac;
 }

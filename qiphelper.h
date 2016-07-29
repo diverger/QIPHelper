@@ -38,8 +38,8 @@ public:
 	~QIPHelper();
 
 public:	// public functions
-	ip_adapter_info_t const &get_adapter_info(int index);
-
+	ip_adapter_info_t	const &get_adapter_info(int index);
+	QString				get_mac_from_ipaddr(QString addr);
 private:	// private members
 	
 	ip_adapter_info_t adapter_info;
